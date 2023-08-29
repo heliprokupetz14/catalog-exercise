@@ -112,7 +112,7 @@ To only run unit tests:
 npm run test:unit
 ```
 
-To only run integration tests: avi
+To only run integration tests:
 ```bash
 npm run test:integration
 ```
