@@ -1,57 +1,263 @@
 openapi: 3.0.1
 info:
-  title: service-name
-  description: basic template for map colonies service
+  title: catalog
+  description: Geospatial Products Catalog
   version: 1.0.0
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
 
 paths:
-  /anotherResource:
+  /product/allProducts:
     get:
-      operationId: getAnotherResource
       tags:
-        - anotherResource
-      summary: gets the resource
+      - General Operations
+      summary: Returns a list of all the products with the offset of 100.
       responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/anotherResource'
-  /resourceName:
-    get:
-      operationId: getResourceName
+        '200':
+          description: Got a list of products.
+        default: 
+            description: unexpected error
+  /product/deleteProduct/{id}: 
+    delete:
+        tags:
+        - General Operations
+        summary: Deletes a product based on the ID supplied.
+        operationId: deleteProduct
+        parameters:
+          - name: id
+            in: path
+            required: true
+            schema:
+              type: integer
+        responses:
+          "204":
+            description: deleted
+          default: 
+              description: unexpected error
+  /product/updateProduct/{id}:
+    put:
       tags:
-        - resourceName
-      summary: gets the resource
+      - General Operations
+      summary: Updates a product based on the ID supplied.
+      operationId: deleteProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content: 
+          application/json:
+            schema:
+              $ref: "#/components/schemas/product"
       responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/resource'
+        "200":
+          description: product response
+        default: 
+            description: unexpected error
+            
+            
+  /product/createProduct:
     post:
-      operationId: createResource
+      summary: creates new product
+      operationId: createProduct
       tags:
-        - resourceName
-      summary: creates a new record of type resource
+        - product
+      requestBody: 
+        required: true
+        description: this is the schema for new product
+        content:
+          application/json:
+            schema: 
+              $ref: "#/components/schemas/product"
+
       responses:
         201:
           description: created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/resource'
+                $ref: '#/components/schemas/product'
         400:
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
+
+  /product/getProduct/{field}/{operator}/{value}:
+    get:
+      tags:
+        - Numeral Operations
+      summary: Returns the products that have a {operator} numeral value in the specified field.
+      operationId: operator
+      parameters:
+        - name: field
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+            - resolutionBest
+            - minZoom
+            - maxZoom
+        - name: operator
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - greater 
+              - greaterEqual
+              - less
+              - lessEqual
+              - equal
+        - name: value
+          in: query
+          required: true
+          schema:
+            type: number
+        
+
+      responses:
+        "200":
+          description: product response
+        default: 
+            description: unexpected error
+ 
+  /product/getTextProduct/{field}/equal/{value}:
+    get:
+      tags:
+        - Textual Operations
+      summary: Returns the products that have a equal textual value (text) in the specified field.
+      operationId: textualEqual
+      parameters:
+        
+        - name: field
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+            - name
+            - description
+            - consumptionLink
+
+        - name: operator
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - equal
+        - name: value
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: product response
+        default: 
+            description: unexpected error
+
+  /product/equalType/{type}/equal/{enum}:
+    get:
+      tags:
+        - Enum Operations
+      summary: Returns the products with the same type.
+      operationId: enumEqual
+      parameters:
+        - name: enum
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+            - raster
+            - rasterized vector
+            - 3d tiles
+            - QMesh
+        - name: operator
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - equal
+      responses:
+        "200":
+          description: product response
+        default: 
+            description: unexpected error
+
+  /product/equalConsumptionProtocol/{protocol}/equal/{enum}:
+    get:
+      tags:
+        - Enum Operations
+      summary: Returns the products with the same consumption protocol.
+      operationId: enumEqual
+      parameters:
+        - name: enum
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+            - WMS
+            - WMTS
+            - XYZ
+            - 3D Tiles
+      responses:
+        "200":
+          description: product response
+        default: 
+            description: unexpected error
+
+  /product/getPolygon/{boundingPolygon}/{operator}/{polygon}:
+    get:
+      tags:
+        - Geo-Shape Operations
+      summary: Returns the products that contain/within/intersects the inserted polygon.
+      operationId: contains
+      parameters:
+        - name: operator
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - contains
+              - within
+              - intersects
+        - name: polygon
+          in: query
+          required: true
+          schema:
+            type: 
+            $ref: "#/components/schemas/boundingPolygon"
+      responses:
+        "200":
+          description: product response
+        default: 
+            description: unexpected error
+
+
+tags:
+- name: General Operations
+  description: General CRUD Operations.
+- name: Numeral Operations
+  description: Get the wanted products by field and inputed numeral value.
+- name: Textual Operations
+  description: Get the wanted products by field and inputed textual value.
+- name: Enum Operations
+  description: Get the wanted products by either type or consumption protocol.
+- name: Geo-Shape Operations
+  description: Get the wanted products by geo-shape.
+
 components:
   schemas:
     error:
@@ -61,27 +267,97 @@ components:
       properties:
         message:
           type: string
-    resource:
+
+    boundingPolygon:
+      type: array
+      properties:
+        type:
+          type: string
+        coordinates: 
+          type: array
+          items:
+            type: array
+            items: 
+              type: array
+              items:
+                type: number
+
+    product:
       type: object
       required:
-        - id
         - name
         - description
+        - boundingPolygon
+        - consumtionLink
+        - type
+        - consumptionProtocol
+        - resolutionBest
+        - minZoom
+        - maxZoom
       properties:
-        id:
-          type: number
-          format: int64
-        name:
+        name: 
           type: string
+          maximum: 48
         description:
           type: string
-    anotherResource:
-      type: object
-      required:
-        - kind
-        - isAlive
-      properties:
-        kind:
+        boundingPolygon:
+          $ref: '#/components/schemas/boundingPolygon'
+        consumtionLink:
           type: string
-        isAlive:
-          type: boolean
+        type:
+          type: string
+          enum: [ raster, rasterizedvector, tile3d, QMesh ]
+        consumptionProtocol:
+          type: string
+          enum: [ WMS, WMTC, XYZ, Tiels3D]
+        resolutionBest:
+          type: number
+        minZoom:
+          type: number
+        maxZoom:
+          type: number  
+
+    Geometry:
+      type: object
+      description: GeoJSon geometry
+      required:
+        - type
+      externalDocs:
+        url: http://geojson.org/geojson-spec.html#geometry-objects
+      properties:
+        type:
+          type: string
+          enum:
+          - Point
+          - LineString
+          - Polygon
+          - MultiPoint
+          - MultiLineString
+          - MultiPolygon
+          description: the geometry type      
+
+    Polygon:
+      type: object
+      description: GeoJSon geometry
+      externalDocs:
+        url: http://geojson.org/geojson-spec.html#id4
+      allOf:
+        - properties:
+            coordinates:
+              type: array
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Point3D'
+    Point3D:
+      type: array
+      description: Point in 3D space
+      externalDocs:
+        url: http://geojson.org/geojson-spec.html#id2
+      minItems: 2
+      maxItems: 3
+      items:
+        type: number
+
+        
+

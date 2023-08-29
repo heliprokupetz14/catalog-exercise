@@ -1,6 +1,6 @@
 import * as supertest from 'supertest';
 
-export class ResourceNameRequestSender {
+export class ProductRequestSender {
   public constructor(private readonly app: Express.Application) {}
 
   public async getResource(): Promise<supertest.Response> {
