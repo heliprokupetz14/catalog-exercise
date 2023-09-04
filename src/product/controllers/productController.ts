@@ -1,22 +1,15 @@
 import { Logger } from '@map-colonies/js-logger';
-// import { BoundCounter, Meter } from '@opentelemetry/api-metrics';
 import { RequestHandler } from 'express';
-import httpStatus from 'http-status-codes';
 import { injectable, inject } from 'tsyringe';
 import { SERVICES } from '../../common/constants';
-// import { ProductManager } from '../models/productManager';
+import { ProductManager } from '../models/productManager';
 import { Request, Response } from 'express';
-import { EntityManager, getConnection, getRepository, Repository, SelectQueryBuilder } from 'typeorm';
-import { Product } from '../entities/productEntity';
-import { GeoSchema, SQLFiltered } from '../../common/interfaces';
-import { GeoOperators } from '../../common/enums';
-import { promises } from 'dns';
-import { InjectRepository } from '@nestjs/typeorm';
+import {  Repository } from 'typeorm';
+import { GeoSchema, SQLFiltered, ProductModel } from '../../common/interfaces';
+import { Operators } from '../../common/enums';
 
-type CreateProductHandler = RequestHandler<undefined, Product, Product>;
-type GetProductHandler = RequestHandler<SQLFiltered, Product[]>;
-type GetGeoProductHandler = RequestHandler<GeoSchema, Product[]>;
-
+type GetProductHandler = RequestHandler<SQLFiltered, ProductModel[]>;
+type GetGeoProductHandler = RequestHandler<GeoSchema, ProductModel[]>;
 
 @injectable()
 export class ProductController {
@@ -24,116 +17,91 @@ export class ProductController {
 
   public constructor(
     @inject(SERVICES.LOGGER) private readonly logger: Logger,
-    @inject(SERVICES.METADATA_REPOSITORY) private readonly repository: Repository<Product>,
-    @InjectRepository(Product) private readonly productRepository: Repository<Product>,
+    @inject(SERVICES.METADATA_REPOSITORY) private readonly repository: Repository<ProductModel>,
+    @inject(ProductManager) private readonly manager: ProductManager
+  ) {}
 
-    // @inject(ProductManager) private readonly manager: ProductManager,
-    // @inject(SERVICES.METER) private readonly meter: Meter
-  ) {
-    // this.createdProductCounter = meter.createCounter('created_product');
-  }
+  public createProduct = async (req: Request, res: Response) => {
+    const productData: ProductModel = req.body;
 
-    
-
-    public createProduct = async (req: Request, res: Response) => {
-      const productData: Product = req.body;
-
-      try {
-        const newProduct = this.repository.save(productData);
-        res.status(201).json(newProduct);
-      } catch (error) {
-        console.error("Error creating product:", error);
-        res.status(500).json({ error: 'Internal server error'});
-      }
+    try {
+      const newProduct = this.manager.createProduct(productData);
+      res.status(201).json(newProduct);
+    } catch (error) {
+      this.logger.error('Error creating product:', error);
+      res.status(500).json({ error: 'Internal server error' });
     };
+  };
 
-    public getAllProducts = async (req:Request, res:Response) => {
-      const productRepository = getRepository(Product);
-      
-      const products = await productRepository.find()
-      res.send(products)
-    }
+  public getAllProducts = async (req: Request, res: Response) => {
+    try {
+      const products = this.manager.getAllProductsInternal();
+      res.send(products);
+    } catch (error) {
+      this.logger.error('Error updating Product:', error);
+      throw new Error('Interval server error');
+    };
+  };
 
-    public deleteProduct = async (req: Request, res: Response) => {
-      const productRepository = getRepository(Product);
-      try {
-      const product = productRepository.delete(req.params.id)
+  public deleteProduct = async (req: Request, res: Response) => {
+    const productId: number = parseInt(req.params.id);
+    try {
+      this.manager.deleteProductById(productId);
       res.json({
-          message: "success"
+        message: 'success',
       });
     } catch (error) {
-      console.error("Error deleting product:", error);
-      res.status(500).json({ error: 'Internal server error'});
-    }
-
-    }
-
-    public updateProduct = async (req: Request, res: Response) => {
-      const productRepository = getRepository(Product);
-      const id: number = parseInt(req.params.id, 10)
-      try {
-      const product = await productRepository.findOneBy({id: id})
-      if(product !== null){
-          productRepository.merge(product, req.body);
-          const result = await productRepository.save(product);
-          res.json({
-              message: "success",
-              payload: result
-          })
-      }
-    } catch (error) {
-      console.error("Error creating product:", error);
-      res.status(500).json({ error: 'Internal server error'});
-    }
-  }
-
-
-    public getProduct: GetProductHandler = async (req, res, next) => {
-      const requestBody: SQLFiltered = req.params;
-      try {
-        const products: Product[] = await this.repository.find();
-        // .createQueryBuilder('product')
-        // .where(`product.${requestrepositoryody.field} ${requestBody.operator} :value`, { value: requestBody.value})
-        // .getMany();
-
-        return res.status(200).json(products);
-      } catch (error) {
-        console.error('Error retrieving products', error);
-        return next(error);
-        // res.status(500).json({ error: 'Internal server error' });
-      }
+      this.logger.error('Error deleting product:', error);
+      res.status(500).json({ error: 'Internal server error' });
     };
-  
+  };
 
-  private getGeoOperator(operator: GeoOperators, value: any): string {
-      switch (operator) {
-        case 'contains':
-          return `ST_Contains(product.boundingPolygon, ST_GeomFromGeoJSON('${JSON.stringify(value)}'))`;
-        case 'within':
-          return `ST_Within(product.boundingPolygon, ST_GeomFromGeoJSON('${JSON.stringify(value)}'))`;
-        case 'intersects':
-          return `ST_Intersects(product.boundingPolygon, ST_GeomFromGeoJSON('${JSON.stringify(value)}'))`;
-        default:
-          throw new Error(`Unsupported geo operation: ${operator}`);
-    }
-  }
-
-  
-  public getPolygonProduct: GetGeoProductHandler = async (req, res, next) => {
-    const requestBody: GeoSchema = req.params;
+  public updateProduct = async (req: Request, res: Response) => {
+    const id: number = parseInt(req.params.id, 10);
     try {
-      const geoOperator = this.getGeoOperator(requestBody.operator, requestBody.value);
-
-      const products = await this.repository
-        .createQueryBuilder('product')
-        .where(geoOperator)
-        .getMany();
-
-      res.status(200).json(products);
+      const updatedProduct = await this.manager.updateProductById(id, req.body);
+      if (updatedProduct) {
+        res.json({
+          message: 'success',
+          payload: updatedProduct,
+        });
+      } else {
+        res.status(404).json({
+          message: 'Product not found'
+        });
+      };
     } catch (error) {
-      console.error('Error retrieving products:', error);
-      next(error);
+      this.logger.error('Error updating product', error);
+      res.status(500).json({ error: 'Internal server error' });
+    };
+  };
+
+  public getProduct: GetProductHandler = async (req, res, next) => {
+    const requestBody: SQLFiltered = {
+      field: req.params.field,
+      operator: Object.values(Operators)[Object.keys(Operators).indexOf(req.params.operator)],
+      value: req.params.value
+    };
+    try {
+      console.log(typeof(requestBody.value));
+      const products: ProductModel[] = await this.manager.getProductsBySQLFilter(requestBody);
+      return res.status(200).json(products);
+    } catch (error) {
+      this.logger.error('Error retrieving products', error);
+      return next(error);
+    };
+  };
+
+
+  public postPolygonProduct: GetProductHandler = async (req, res, next) => {
+    const { operator, value } = req.body;
+
+    try {
+      const products = await this.manager.queryProductsByPolygon(operator, value);
+      return res.status(200).json(products);
+    } catch (error) {
+      console.error('Error querying products:', error);
+      this.logger.error('Error retrieving products', error);
     }
   };
-}
-
+};

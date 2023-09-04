@@ -11,34 +11,34 @@ paths:
   /product/allProducts:
     get:
       tags:
-      - General Operations
+        - General Operations
       summary: Returns a list of all the products with the offset of 100.
       responses:
         '200':
           description: Got a list of products.
-        default: 
-            description: unexpected error
-  /product/deleteProduct/{id}: 
+        default:
+          description: unexpected error
+  /product/deleteProduct/{id}:
     delete:
-        tags:
+      tags:
         - General Operations
-        summary: Deletes a product based on the ID supplied.
-        operationId: deleteProduct
-        parameters:
-          - name: id
-            in: path
-            required: true
-            schema:
-              type: integer
-        responses:
-          "204":
-            description: deleted
-          default: 
-              description: unexpected error
+      summary: Deletes a product based on the ID supplied.
+      operationId: deleteProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: deleted
+        default:
+          description: unexpected error
   /product/updateProduct/{id}:
     put:
       tags:
-      - General Operations
+        - General Operations
       summary: Updates a product based on the ID supplied.
       operationId: deleteProduct
       parameters:
@@ -49,30 +49,29 @@ paths:
             type: integer
       requestBody:
         required: true
-        content: 
+        content:
           application/json:
             schema:
-              $ref: "#/components/schemas/product"
+              $ref: '#/components/schemas/product'
       responses:
-        "200":
+        '200':
           description: product response
-        default: 
-            description: unexpected error
-            
-            
+        default:
+          description: unexpected error
+
   /product/createProduct:
     post:
+      tags:
+      - General Operations
       summary: creates new product
       operationId: createProduct
-      tags:
-        - product
-      requestBody: 
+      requestBody:
         required: true
         description: this is the schema for new product
         content:
           application/json:
-            schema: 
-              $ref: "#/components/schemas/product"
+            schema:
+              $ref: '#/components/schemas/product'
 
       responses:
         201:
@@ -93,78 +92,76 @@ paths:
       tags:
         - Numeral Operations
       summary: Returns the products that have a {operator} numeral value in the specified field.
-      operationId: operator
+      operationId: getProduct
       parameters:
         - name: field
-          in: query
+          in: path
           required: true
           schema:
             type: string
             enum:
-            - resolutionBest
-            - minZoom
-            - maxZoom
+              - resolution_best
+              - min_zoom
+              - max_zoom
         - name: operator
-          in: query
+          in: path
           required: true
           schema:
             type: string
             enum:
-              - greater 
-              - greaterEqual
-              - less
-              - lessEqual
-              - equal
+              - Greater
+              - GreaterEqual
+              - Less
+              - LessEqual
+              - Equal
         - name: value
-          in: query
+          in: path
           required: true
           schema:
             type: number
-        
 
       responses:
-        "200":
+        '200':
           description: product response
-        default: 
-            description: unexpected error
- 
-  /product/getTextProduct/{field}/equal/{value}:
+        default:
+          description: unexpected error
+
+  /product/getTextProduct/{field}/{operator}/{value}:
     get:
       tags:
         - Textual Operations
       summary: Returns the products that have a equal textual value (text) in the specified field.
       operationId: textualEqual
       parameters:
-        
         - name: field
-          in: query
+          in: path
           required: true
           schema:
             type: string
             enum:
-            - name
-            - description
-            - consumptionLink
+              - name
+              - description
+              - consumption_link
 
         - name: operator
-          in: query
+          in: path
           required: true
           schema:
             type: string
             enum:
-              - equal
+              - Equal
         - name: value
-          in: query
+          in: path
           required: true
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: product response
-        default: 
-            description: unexpected error
+        default:
+          description: unexpected error
 
-  /product/equalType/{type}/equal/{enum}:
+  /product/equalType/type/{operator}/{enum}:
     get:
       tags:
         - Enum Operations
@@ -172,29 +169,29 @@ paths:
       operationId: enumEqual
       parameters:
         - name: enum
-          in: query
+          in: path
           required: true
           schema:
             type: string
             enum:
-            - raster
-            - rasterized vector
-            - 3d tiles
-            - QMesh
+              - raster
+              - rasterized vector
+              - 3d tiles
+              - QMesh
         - name: operator
-          in: query
+          in: path
           required: true
           schema:
             type: string
             enum:
-              - equal
+              - Equal
       responses:
-        "200":
+        '200':
           description: product response
-        default: 
-            description: unexpected error
+        default:
+          description: unexpected error
 
-  /product/equalConsumptionProtocol/{protocol}/equal/{enum}:
+  /product/equalConsumptionProtocol/protocol/{equal}/{enum}:
     get:
       tags:
         - Enum Operations
@@ -202,61 +199,82 @@ paths:
       operationId: enumEqual
       parameters:
         - name: enum
-          in: query
+          in: path
           required: true
           schema:
             type: string
             enum:
-            - WMS
-            - WMTS
-            - XYZ
-            - 3D Tiles
+              - WMS
+              - WMTS
+              - XYZ
+              - 3D Tiles
+        - name: operator
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - Equal
       responses:
-        "200":
+        '200':
           description: product response
-        default: 
-            description: unexpected error
+        default:
+          description: unexpected error
 
-  /product/getPolygon/{boundingPolygon}/{operator}/{polygon}:
-    get:
+  /product/postPolygon:
+    post:
       tags:
         - Geo-Shape Operations
-      summary: Returns the products that contain/within/intersects the inserted polygon.
-      operationId: contains
-      parameters:
-        - name: operator
-          in: query
-          required: true
-          schema:
-            type: string
-            enum:
-              - contains
-              - within
-              - intersects
-        - name: polygon
-          in: query
-          required: true
-          schema:
-            type: 
-            $ref: "#/components/schemas/boundingPolygon"
+      summary: Query products by polygon
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                operator:
+                  type: string
+                  enum: ['contains', 'within', 'intersects']
+                  description: The geographical operator (contains, within, intersects)
+                value:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum: ['Polygon']
+                    coordinates:
+                        type: array
+                        items:
+                          type: array
+                          items:
+                            type: array
+                            items:
+                              type: number
+                  description: The geographical value (Polygon)
       responses:
-        "200":
-          description: product response
-        default: 
-            description: unexpected error
-
-
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              example: { message: 'Query successful', results: [] }
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              example: { message: 'Invalid request body' }
+            
 tags:
-- name: General Operations
-  description: General CRUD Operations.
-- name: Numeral Operations
-  description: Get the wanted products by field and inputed numeral value.
-- name: Textual Operations
-  description: Get the wanted products by field and inputed textual value.
-- name: Enum Operations
-  description: Get the wanted products by either type or consumption protocol.
-- name: Geo-Shape Operations
-  description: Get the wanted products by geo-shape.
+  - name: General Operations
+    description: General CRUD Operations.
+  - name: Numeral Operations
+    description: Get the wanted products by field and inputed numeral value.
+  - name: Textual Operations
+    description: Get the wanted products by field and inputed textual value.
+  - name: Enum Operations
+    description: Get the wanted products by either type or consumption protocol.
+  - name: Geo-Shape Operations
+    description: Get the wanted products by geo-shape.
 
 components:
   schemas:
@@ -273,11 +291,11 @@ components:
       properties:
         type:
           type: string
-        coordinates: 
+        coordinates:
           type: array
           items:
             type: array
-            items: 
+            items:
               type: array
               items:
                 type: number
@@ -295,7 +313,7 @@ components:
         - minZoom
         - maxZoom
       properties:
-        name: 
+        name:
           type: string
           maximum: 48
         description:
@@ -306,16 +324,16 @@ components:
           type: string
         type:
           type: string
-          enum: [ raster, rasterizedvector, tile3d, QMesh ]
+          enum: [raster, rasterizedvector, tile3d, QMesh]
         consumptionProtocol:
           type: string
-          enum: [ WMS, WMTC, XYZ, Tiels3D]
+          enum: [WMS, WMTC, XYZ, Tiels3D]
         resolutionBest:
           type: number
         minZoom:
           type: number
         maxZoom:
-          type: number  
+          type: number
 
     Geometry:
       type: object
@@ -328,13 +346,13 @@ components:
         type:
           type: string
           enum:
-          - Point
-          - LineString
-          - Polygon
-          - MultiPoint
-          - MultiLineString
-          - MultiPolygon
-          description: the geometry type      
+            - Point
+            - LineString
+            - Polygon
+            - MultiPoint
+            - MultiLineString
+            - MultiPolygon
+          description: the geometry type
 
     Polygon:
       type: object
@@ -358,6 +376,3 @@ components:
       maxItems: 3
       items:
         type: number
-
-        
-

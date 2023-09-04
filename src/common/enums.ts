@@ -23,5 +23,5 @@ export enum ProductType {
 export enum GeoOperators {
   contains = 'contains',
   within = 'within',
-  intersects = 'intersects'
+  intersects = 'intersects',
 }

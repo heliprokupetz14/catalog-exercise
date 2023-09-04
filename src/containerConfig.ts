@@ -24,8 +24,7 @@ export const registerExternalValues = async (options?: RegisterOptions): Promise
   const loggerConfig = config.get<LoggerOptions>('telemetry.logger');
   const logger = jsLogger({ ...loggerConfig, prettyPrint: loggerConfig.prettyPrint, mixin: getOtelMixin() });
   const dbConfig = config.get<DbConfig>('dbConfig');
-  const dbConnection = await createConnection({ entities: ENTITIES_DIRS, ...dbConfig})
-  
+  const dbConnection = await createConnection({ entities: ENTITIES_DIRS, ...dbConfig });
 
   const metrics = new Metrics();
   metrics.start();
@@ -40,7 +39,6 @@ export const registerExternalValues = async (options?: RegisterOptions): Promise
     { token: SERVICES.METER, provider: { useValue: OtelMetrics.getMeterProvider().getMeter(SERVICE_NAME) } },
     { token: PRODUCT_ROUTER_SYMBOL, provider: { useFactory: productFactory } },
     { token: ANOTHER_RESOURECE_ROUTER_SYMBOL, provider: { useFactory: anotherResourceRouterFactory } },
-    { token: SERVICES.DATABASE, provider: { useValue: dbConnection } },
     { token: SERVICES.METADATA_REPOSITORY, provider: { useValue: dbConnection.getRepository(Product) } },
     {
       token: 'onSignal',

@@ -1,23 +1,23 @@
-import { ConsumptionProtocol, Operators, ProductType, GeoOperators} from './enums';
+import { ConsumptionProtocol, Operators, ProductType, GeoOperators } from './enums';
 
 export interface IConfig {
   get: <T>(setting: string) => T;
   has: (setting: string) => boolean;
-};
+}
 
 export interface OpenApiConfig {
   filePath: string;
   basePath: string;
   jsonPath: string;
   uiPath: string;
-};
+}
 
 export interface BoundingPolygon {
   type: string;
   coordinates: number[][];
 };
 
-export interface Product {
+export interface ProductModel {
   id: number;
   name: string;
   description: string;
@@ -28,33 +28,29 @@ export interface Product {
   resolutionBest: number;
   minZoom: number;
   maxZoom: number;
-};
+}
 
 export interface SQLFiltered {
   field: string;
-  operator: Operators;
-  value: unknown;
-  
-};
+  operator: string;
+  value: string | number;
+}
 
 export interface GeoSchema {
   field: string;
   operator: GeoOperators;
   value: unknown;
-  
-};
+}
 
 export interface PingResponse {
   message: string;
-};
+}
 
 export interface DbConfig {
-  type: "postgres";
+  type: 'postgres';
   username: 'postgres';
   password: 'postgres';
   host: 'localhost';
   port: 5432;
   database: 'catalog';
-  
-  
-};
+}

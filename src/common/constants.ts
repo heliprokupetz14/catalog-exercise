@@ -1,9 +1,8 @@
 import { readPackageJsonSync } from '@map-colonies/read-pkg';
 import { container } from 'tsyringe';
 import { ProductType, ConsumptionProtocol } from './enums';
-import { createConnection } from "typeorm";
+import { createConnection } from 'typeorm';
 import { Product } from '../product/entities/productEntity';
-
 
 export const SERVICE_NAME = readPackageJsonSync().name ?? 'unknown_service';
 export const DEFAULT_SERVER_PORT = 80;
@@ -21,7 +20,6 @@ export const SERVICES: Record<string, symbol> = {
   METADATA_REPOSITORY: Symbol('Database'),
 };
 /* eslint-enable @typescript-eslint/naming-convention */
-
 
 export const productSchema = {
   type: 'object',
@@ -47,11 +45,11 @@ export const productSchema = {
 };
 
 export const connection = createConnection({
-  type: "postgres",
-  host: "localhost",
+  type: 'postgres',
+  host: 'localhost',
   port: 5432,
-  username: "postgres",
-  password: "postgres",
-  database: "catalog",
+  username: 'postgres',
+  password: 'postgres',
+  database: 'catalog',
   entities: [Product],
 });
