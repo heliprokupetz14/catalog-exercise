@@ -5,11 +5,12 @@ import { SERVICES } from '../../common/constants';
 import { ProductManager } from '../models/productManager';
 import { Request, Response } from 'express';
 import {  Repository } from 'typeorm';
-import { GeoSchema, SQLFiltered, ProductModel } from '../../common/interfaces';
+import { GeoSchema, SQLFiltered } from '../../common/interfaces';
 import { Operators } from '../../common/enums';
+import { Product } from '../entities/productEntity';
 
-type GetProductHandler = RequestHandler<SQLFiltered, ProductModel[]>;
-type GetGeoProductHandler = RequestHandler<GeoSchema, ProductModel[]>;
+type GetProductHandler = RequestHandler<SQLFiltered, Product[]>;
+type GetGeoProductHandler = RequestHandler<GeoSchema, Product[]>;
 
 @injectable()
 export class ProductController {
@@ -17,12 +18,12 @@ export class ProductController {
 
   public constructor(
     @inject(SERVICES.LOGGER) private readonly logger: Logger,
-    @inject(SERVICES.METADATA_REPOSITORY) private readonly repository: Repository<ProductModel>,
+    @inject(SERVICES.METADATA_REPOSITORY) private readonly repository: Repository<Product>,
     @inject(ProductManager) private readonly manager: ProductManager
   ) {}
 
   public createProduct = async (req: Request, res: Response) => {
-    const productData: ProductModel = req.body;
+    const productData: Product = req.body;
 
     try {
       const newProduct = this.manager.createProduct(productData);
@@ -35,8 +36,8 @@ export class ProductController {
 
   public getAllProducts = async (req: Request, res: Response) => {
     try {
-      const products = this.manager.getAllProductsInternal();
-      res.send(products);
+      const products: Product[] = await this.manager.getAllProductsInternal();
+      return res.send(products);
     } catch (error) {
       this.logger.error('Error updating Product:', error);
       throw new Error('Interval server error');
@@ -84,7 +85,7 @@ export class ProductController {
     };
     try {
       console.log(typeof(requestBody.value));
-      const products: ProductModel[] = await this.manager.getProductsBySQLFilter(requestBody);
+      const products: Product[] = await this.manager.getProductsBySQLFilter(requestBody);
       return res.status(200).json(products);
     } catch (error) {
       this.logger.error('Error retrieving products', error);

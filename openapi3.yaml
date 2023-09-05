@@ -224,7 +224,7 @@ paths:
   /product/postPolygon:
     post:
       tags:
-        - Geo-Shape Operations
+      - Geo-Shape Operations
       summary: Query products by polygon
       requestBody:
         required: true
@@ -238,20 +238,8 @@ paths:
                   enum: ['contains', 'within', 'intersects']
                   description: The geographical operator (contains, within, intersects)
                 value:
-                  type: object
-                  properties:
-                    type:
-                      type: string
-                      enum: ['Polygon']
-                    coordinates:
-                        type: array
-                        items:
-                          type: array
-                          items:
-                            type: array
-                            items:
-                              type: number
-                  description: The geographical value (Polygon)
+                  $ref: '#/components/schemas/boundingPolygon'
+
       responses:
         '200':
           description: Successful response
@@ -287,18 +275,20 @@ components:
           type: string
 
     boundingPolygon:
-      type: array
+      type: object
       properties:
         type:
           type: string
+          enum: ['Polygon']
         coordinates:
-          type: array
-          items:
             type: array
             items:
               type: array
               items:
-                type: number
+                type: array
+                items:
+                  type: number
+      description: The geographical value (Polygon)
 
     product:
       type: object

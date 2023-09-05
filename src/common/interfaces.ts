@@ -1,3 +1,4 @@
+import { GeoJSON } from 'typeorm';
 import { ConsumptionProtocol, Operators, ProductType, GeoOperators } from './enums';
 
 export interface IConfig {
@@ -10,24 +11,6 @@ export interface OpenApiConfig {
   basePath: string;
   jsonPath: string;
   uiPath: string;
-}
-
-export interface BoundingPolygon {
-  type: string;
-  coordinates: number[][];
-};
-
-export interface ProductModel {
-  id: number;
-  name: string;
-  description: string;
-  boundingPolygon: BoundingPolygon;
-  consumtionLink: string;
-  type: ProductType;
-  consumptionProtocol: ConsumptionProtocol;
-  resolutionBest: number;
-  minZoom: number;
-  maxZoom: number;
 }
 
 export interface SQLFiltered {

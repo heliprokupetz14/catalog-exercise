@@ -1,9 +1,10 @@
 import { Logger } from '@map-colonies/js-logger';
 import { inject, injectable } from 'tsyringe';
 import { SERVICES } from '../../common/constants';
-import { ProductModel, SQLFiltered } from '../../common/interfaces';
+import { SQLFiltered } from '../../common/interfaces';
 import {  LessThan, Repository } from 'typeorm';
 import { GeoOperators } from '../../common/enums';
+import { Product } from '../entities/productEntity';
 ;
 
 function generateRandomId(): number {
@@ -13,11 +14,13 @@ function generateRandomId(): number {
 
 @injectable()
 export class ProductManager {
-  private productRepository!: Repository<ProductModel>;
+  static getResource() {
+    throw new Error('Method not implemented.');
+  }
 
   public constructor(
     @inject(SERVICES.LOGGER) private readonly logger: Logger,
-    @inject(SERVICES.METADATA_REPOSITORY) private readonly repository: Repository<ProductModel>
+    @inject(SERVICES.METADATA_REPOSITORY) private readonly repository: Repository<Product>
   ) {}
 
   public getGeoOperator(operator: GeoOperators, value: any): string {
@@ -33,7 +36,7 @@ export class ProductManager {
     };
   };
 
-  public async createProduct(productData: ProductModel): Promise<ProductModel> {
+  public async createProduct(productData: Product): Promise<Product> {
     try {
       return await this.repository.save(productData);
     } catch (error) {
@@ -41,9 +44,10 @@ export class ProductManager {
     };
   };
 
-  public async getAllProductsInternal(): Promise<ProductModel[]> {
+  public async getAllProductsInternal(): Promise<Product[]> {
     try {
-      return await this.repository.find();
+      const products = await this.repository.find();
+      return products;
     } catch (error) {
       throw error;
     };
@@ -57,7 +61,7 @@ export class ProductManager {
     };
   };
 
-  public async updateProductById(id: number, dataToUpdate: Partial<ProductModel>): Promise<ProductModel | undefined> {
+  public async updateProductById(id: number, dataToUpdate: Partial<Product>): Promise<Product | undefined> {
     try {
       const product = await this.repository.findOneBy({ id });
       if (product) {
@@ -70,15 +74,10 @@ export class ProductManager {
     };
   };
 
-  public async getProductsBySQLFilter(requestBody: SQLFiltered): Promise<ProductModel[]> {
+  public async getProductsBySQLFilter(requestBody: SQLFiltered): Promise<Product[]> {
     try {
       const query = `SELECT * FROM products WHERE ${requestBody.field} ${requestBody.operator} '${requestBody.value}'`;
-      const products: ProductModel[] = await this.repository.query(query);
-      // find({
-      //   where: {
-      //     [requestBody.field]: LessThan(requestBody.value),
-      //   },
-      // });
+      const products: Product[] = await this.repository.query(query);
       return products;
     } catch (error) {
       throw error;
@@ -86,7 +85,7 @@ export class ProductManager {
   };
 
 
-  public async queryProductsByPolygon(operator: string, value: any): Promise<ProductModel[]> {
+  public async queryProductsByPolygon(operator: string, value: any): Promise<Product[]> {
     let sqlQuery = '';
     switch (operator) {
       case 'contains':
