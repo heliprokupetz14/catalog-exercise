@@ -2,11 +2,9 @@ import { Logger } from '@map-colonies/js-logger';
 import { inject, injectable } from 'tsyringe';
 import { SERVICES } from '../../common/constants';
 import { SQLFiltered } from '../../common/interfaces';
-import {  LessThan, Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { GeoOperators } from '../../common/enums';
 import { Product } from '../entities/productEntity';
-;
-
 function generateRandomId(): number {
   const rangeOfIds = 100;
   return Math.floor(Math.random() * rangeOfIds);
@@ -14,35 +12,25 @@ function generateRandomId(): number {
 
 @injectable()
 export class ProductManager {
-  static getResource() {
+  error(error: any) {
     throw new Error('Method not implemented.');
   }
+  // static getResource() {
+  //   throw new Error('Method not implemented.');
+  // }
 
   public constructor(
     @inject(SERVICES.LOGGER) private readonly logger: Logger,
     @inject(SERVICES.METADATA_REPOSITORY) private readonly repository: Repository<Product>
   ) {}
 
-  public getGeoOperator(operator: GeoOperators, value: any): string {
-    switch (operator) {
-      case 'contains':
-        return `ST_Contains(product.boundingPolygon, ST_GeomFromGeoJSON('${JSON.stringify(value)}'))`;
-      case 'within':
-        return `ST_Within(product.boundingPolygon, ST_GeomFromGeoJSON('${JSON.stringify(value)}'))`;
-      case 'intersects':
-        return `ST_Intersects(product.boundingPolygon, ST_GeomFromGeoJSON('${JSON.stringify(value)}'))`;
-      default:
-        throw new Error(`Unsupported geo operation: ${operator}`);
-    };
-  };
-
   public async createProduct(productData: Product): Promise<Product> {
     try {
       return await this.repository.save(productData);
     } catch (error) {
       throw error;
-    };
-  };
+    }
+  }
 
   public async getAllProductsInternal(): Promise<Product[]> {
     try {
@@ -50,16 +38,16 @@ export class ProductManager {
       return products;
     } catch (error) {
       throw error;
-    };
-  };
+    }
+  }
 
   public async deleteProductById(id: number): Promise<void> {
     try {
       await this.repository.delete(id);
     } catch (error) {
       throw error;
-    };
-  };
+    }
+  }
 
   public async updateProductById(id: number, dataToUpdate: Partial<Product>): Promise<Product | undefined> {
     try {
@@ -71,8 +59,8 @@ export class ProductManager {
       return undefined;
     } catch (error) {
       throw error;
-    };
-  };
+    }
+  }
 
   public async getProductsBySQLFilter(requestBody: SQLFiltered): Promise<Product[]> {
     try {
@@ -81,9 +69,8 @@ export class ProductManager {
       return products;
     } catch (error) {
       throw error;
-    };
-  };
-
+    }
+  }
 
   public async queryProductsByPolygon(operator: string, value: any): Promise<Product[]> {
     let sqlQuery = '';
@@ -100,7 +87,7 @@ export class ProductManager {
       default:
         throw new Error(`Unsupported geo operation: ${operator}`);
     }
-    this.logger.info(sqlQuery)
+    this.logger.info(sqlQuery);
 
     try {
       const products = await this.repository.query(sqlQuery);

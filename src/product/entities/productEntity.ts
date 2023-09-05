@@ -1,7 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, GeoJSON } from 'typeorm';
 import { ConsumptionProtocol, ProductType } from '../../common/enums';
 
-
 @Entity({ name: 'products' })
 export class Product {
   @PrimaryGeneratedColumn()
@@ -34,5 +33,3 @@ export class Product {
   @Column({ name: 'max_zoom', type: 'integer' })
   maxZoom!: number;
 }
-
-

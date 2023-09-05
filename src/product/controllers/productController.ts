@@ -4,7 +4,7 @@ import { injectable, inject } from 'tsyringe';
 import { SERVICES } from '../../common/constants';
 import { ProductManager } from '../models/productManager';
 import { Request, Response } from 'express';
-import {  Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { GeoSchema, SQLFiltered } from '../../common/interfaces';
 import { Operators } from '../../common/enums';
 import { Product } from '../entities/productEntity';
@@ -31,7 +31,7 @@ export class ProductController {
     } catch (error) {
       this.logger.error('Error creating product:', error);
       res.status(500).json({ error: 'Internal server error' });
-    };
+    }
   };
 
   public getAllProducts = async (req: Request, res: Response) => {
@@ -41,7 +41,7 @@ export class ProductController {
     } catch (error) {
       this.logger.error('Error updating Product:', error);
       throw new Error('Interval server error');
-    };
+    }
   };
 
   public deleteProduct = async (req: Request, res: Response) => {
@@ -54,7 +54,7 @@ export class ProductController {
     } catch (error) {
       this.logger.error('Error deleting product:', error);
       res.status(500).json({ error: 'Internal server error' });
-    };
+    }
   };
 
   public updateProduct = async (req: Request, res: Response) => {
@@ -68,31 +68,30 @@ export class ProductController {
         });
       } else {
         res.status(404).json({
-          message: 'Product not found'
+          message: 'Product not found',
         });
-      };
+      }
     } catch (error) {
       this.logger.error('Error updating product', error);
       res.status(500).json({ error: 'Internal server error' });
-    };
+    }
   };
 
   public getProduct: GetProductHandler = async (req, res, next) => {
     const requestBody: SQLFiltered = {
       field: req.params.field,
       operator: Object.values(Operators)[Object.keys(Operators).indexOf(req.params.operator)],
-      value: req.params.value
+      value: req.params.value,
     };
     try {
-      console.log(typeof(requestBody.value));
+      console.log(typeof requestBody.value);
       const products: Product[] = await this.manager.getProductsBySQLFilter(requestBody);
       return res.status(200).json(products);
     } catch (error) {
       this.logger.error('Error retrieving products', error);
       return next(error);
-    };
+    }
   };
-
 
   public postPolygonProduct: GetProductHandler = async (req, res, next) => {
     const { operator, value } = req.body;
@@ -105,4 +104,4 @@ export class ProductController {
       this.logger.error('Error retrieving products', error);
     }
   };
-};
+}

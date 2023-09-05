@@ -62,7 +62,7 @@ paths:
   /product/createProduct:
     post:
       tags:
-      - General Operations
+        - General Operations
       summary: creates new product
       operationId: createProduct
       requestBody:
@@ -224,7 +224,7 @@ paths:
   /product/postPolygon:
     post:
       tags:
-      - Geo-Shape Operations
+        - Geo-Shape Operations
       summary: Query products by polygon
       requestBody:
         required: true
@@ -251,7 +251,7 @@ paths:
           content:
             application/json:
               example: { message: 'Invalid request body' }
-            
+
 tags:
   - name: General Operations
     description: General CRUD Operations.
@@ -281,13 +281,13 @@ components:
           type: string
           enum: ['Polygon']
         coordinates:
+          type: array
+          items:
             type: array
             items:
               type: array
               items:
-                type: array
-                items:
-                  type: number
+                type: number
       description: The geographical value (Polygon)
 
     product:
