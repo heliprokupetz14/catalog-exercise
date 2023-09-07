@@ -5,7 +5,6 @@ import { Product } from '../../../../src/product/entities/productEntity';
 import { validProduct } from '../../../mocks/productMock';
 import { Repository } from 'typeorm';
 import { SQLFiltered } from '../../../../src/common/interfaces';
-import { GeoOperators } from '../../../../src/common/enums';
 
 describe('ProductManager', () => {
   const repositoryMock = {

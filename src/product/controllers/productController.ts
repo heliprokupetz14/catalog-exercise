@@ -10,7 +10,7 @@ import { Operators } from '../../common/enums';
 import { Product } from '../entities/productEntity';
 
 type GetProductHandler = RequestHandler<SQLFiltered, Product[]>;
-type GetGeoProductHandler = RequestHandler<GeoSchema, Product[]>;
+
 
 @injectable()
 export class ProductController {

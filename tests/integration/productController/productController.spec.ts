@@ -9,8 +9,7 @@ import config from 'config';
 import { ENTITIES_DIRS } from '../../../src/containerConfig';
 import { Product } from '../../../src/product/entities/productEntity';
 import {createFakeEntity, createFakeProduct, getRandomEnumValue} from '../../../src/helpers/helpers'
-import { GeoOperators, Operators } from '../../../src/common/enums';
-import { SQLFiltered } from '../../../src/common/interfaces';
+import { GeoOperators } from '../../../src/common/enums';
 
 
   describe('ProductController', function () {
