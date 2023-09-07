@@ -14,7 +14,6 @@ type GetGeoProductHandler = RequestHandler<GeoSchema, Product[]>;
 
 @injectable()
 export class ProductController {
-  // private readonly createdProductCounter: BoundCounter;
 
   public constructor(
     @inject(SERVICES.LOGGER) private readonly logger: Logger,
@@ -104,4 +103,17 @@ export class ProductController {
       this.logger.error('Error retrieving products', error);
     }
   };
+
+  public getById = async (res: Response, req: Request) => {
+    const productId: number = parseInt(req.params.id);
+    try {
+      const product = await this.manager.getById(productId)
+      res.json({
+        message: 'success',
+      });
+    } catch (error) {
+      this.logger.error('Error deleting product:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
 }

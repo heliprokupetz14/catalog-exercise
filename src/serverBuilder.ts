@@ -11,7 +11,6 @@ import { defaultMetricsMiddleware, getTraceContexHeaderMiddleware } from '@map-c
 import { SERVICES } from './common/constants';
 import { IConfig } from './common/interfaces';
 import { PRODUCT_ROUTER_SYMBOL } from './product/routes/productRouter';
-import { ANOTHER_RESOURECE_ROUTER_SYMBOL } from './anotherResource/routes/anotherResourceRouter';
 
 @injectable()
 export class ServerBuilder {
@@ -21,7 +20,6 @@ export class ServerBuilder {
     @inject(SERVICES.CONFIG) private readonly config: IConfig,
     @inject(SERVICES.LOGGER) private readonly logger: Logger,
     @inject(PRODUCT_ROUTER_SYMBOL) private readonly productRouter: Router,
-    @inject(ANOTHER_RESOURECE_ROUTER_SYMBOL) private readonly anotherResourceRouter: Router
   ) {
     this.serverInstance = express();
   }

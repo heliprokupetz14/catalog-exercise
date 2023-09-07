@@ -28,12 +28,3 @@ export interface GeoSchema {
 export interface PingResponse {
   message: string;
 }
-
-export interface DbConfig {
-  type: 'postgres';
-  username: 'postgres';
-  password: 'postgres';
-  host: 'localhost';
-  port: 5432;
-  database: 'catalog';
-}

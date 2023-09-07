@@ -32,4 +32,5 @@ export class Product {
 
   @Column({ name: 'max_zoom', type: 'integer' })
   maxZoom!: number;
+    static productType: any;
 }

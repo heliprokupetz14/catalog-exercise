@@ -1,6 +1,5 @@
 FROM node:20 as build
 
-
 WORKDIR /tmp/buildApp
 
 COPY ./package*.json ./
@@ -14,8 +13,6 @@ FROM node:20.3.1-alpine3.17 as production
 RUN apk add dumb-init
 
 ENV NODE_ENV=production
-ENV SERVER_PORT=8080
-
 
 WORKDIR /usr/src/app
 

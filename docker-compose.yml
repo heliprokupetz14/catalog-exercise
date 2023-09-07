@@ -1,0 +1,13 @@
+version: '2'
+
+services:
+  postgres:
+    image: docker.io/bitnami/postgresql:14
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_DB=catalog
+      - DOCKER_HOST=localhost
+ 

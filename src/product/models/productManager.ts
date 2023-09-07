@@ -2,22 +2,15 @@ import { Logger } from '@map-colonies/js-logger';
 import { inject, injectable } from 'tsyringe';
 import { SERVICES } from '../../common/constants';
 import { SQLFiltered } from '../../common/interfaces';
-import { LessThan, Repository } from 'typeorm';
-import { GeoOperators } from '../../common/enums';
+import { Repository } from 'typeorm';
 import { Product } from '../entities/productEntity';
-function generateRandomId(): number {
-  const rangeOfIds = 100;
-  return Math.floor(Math.random() * rangeOfIds);
-}
+
 
 @injectable()
 export class ProductManager {
   error(error: any) {
-    throw new Error('Method not implemented.');
   }
-  // static getResource() {
-  //   throw new Error('Method not implemented.');
-  // }
+ 
 
   public constructor(
     @inject(SERVICES.LOGGER) private readonly logger: Logger,
@@ -96,4 +89,13 @@ export class ProductManager {
       throw new Error(`Error querying products: ${error}`);
     }
   }
+
+  public async getById (id:number): Promise<void> {
+    try {
+      await this.repository.findOneBy({id});
+    } catch (error) {
+      throw error;
+    }
+  }
 }
+

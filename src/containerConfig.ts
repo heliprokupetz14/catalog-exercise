@@ -8,9 +8,7 @@ import { SERVICES, SERVICE_NAME } from './common/constants';
 import { tracing } from './common/tracing';
 import { productFactory, PRODUCT_ROUTER_SYMBOL } from './product/routes/productRouter';
 import { InjectionObject, registerDependencies } from './common/dependencyRegistration';
-import { anotherResourceRouterFactory, ANOTHER_RESOURECE_ROUTER_SYMBOL } from './anotherResource/routes/anotherResourceRouter';
-import { DbConfig } from './common/interfaces';
-import { createConnection } from 'typeorm';
+import { DataSourceOptions, createConnection } from 'typeorm';
 import { Product } from './product/entities/productEntity';
 
 export const ENTITIES_DIRS = [Product, 'src/product/entities/*.ts'];
@@ -23,7 +21,7 @@ export interface RegisterOptions {
 export const registerExternalValues = async (options?: RegisterOptions): Promise<DependencyContainer> => {
   const loggerConfig = config.get<LoggerOptions>('telemetry.logger');
   const logger = jsLogger({ ...loggerConfig, prettyPrint: loggerConfig.prettyPrint, mixin: getOtelMixin() });
-  const dbConfig = config.get<DbConfig>('dbConfig');
+  const dbConfig = config.get<DataSourceOptions>('dbConfig');
   const dbConnection = await createConnection({ entities: ENTITIES_DIRS, ...dbConfig });
 
   const metrics = new Metrics();
@@ -38,7 +36,6 @@ export const registerExternalValues = async (options?: RegisterOptions): Promise
     { token: SERVICES.TRACER, provider: { useValue: tracer } },
     { token: SERVICES.METER, provider: { useValue: OtelMetrics.getMeterProvider().getMeter(SERVICE_NAME) } },
     { token: PRODUCT_ROUTER_SYMBOL, provider: { useFactory: productFactory } },
-    { token: ANOTHER_RESOURECE_ROUTER_SYMBOL, provider: { useFactory: anotherResourceRouterFactory } },
     { token: SERVICES.METADATA_REPOSITORY, provider: { useValue: dbConnection.getRepository(Product) } },
     {
       token: 'onSignal',
