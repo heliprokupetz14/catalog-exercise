@@ -1,8 +1,7 @@
 import { readPackageJsonSync } from '@map-colonies/read-pkg';
-import { container } from 'tsyringe';
-import { ProductType, ConsumptionProtocol } from './enums';
 import { createConnection } from 'typeorm';
 import { Product } from '../product/entities/productEntity';
+import { ProductType, ConsumptionProtocol } from './enums';
 
 export const SERVICE_NAME = readPackageJsonSync().name ?? 'unknown_service';
 export const DEFAULT_SERVER_PORT = 80;

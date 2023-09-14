@@ -1,5 +1,4 @@
-import { GeoJSON } from 'typeorm';
-import { ConsumptionProtocol, Operators, ProductType, GeoOperators } from './enums';
+import { GeoOperators } from './enums';
 
 export interface IConfig {
   get: <T>(setting: string) => T;

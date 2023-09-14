@@ -1,17 +1,13 @@
+/* eslint-disable no-useless-catch */
 import { Logger } from '@map-colonies/js-logger';
 import { inject, injectable } from 'tsyringe';
+import { Repository } from 'typeorm';
 import { SERVICES } from '../../common/constants';
 import { SQLFiltered } from '../../common/interfaces';
-import { Repository } from 'typeorm';
 import { Product } from '../entities/productEntity';
-
 
 @injectable()
 export class ProductManager {
-  error(error: any) {
-  }
- 
-
   public constructor(
     @inject(SERVICES.LOGGER) private readonly logger: Logger,
     @inject(SERVICES.METADATA_REPOSITORY) private readonly repository: Repository<Product>
@@ -47,7 +43,7 @@ export class ProductManager {
       const product = await this.repository.findOneBy({ id });
       if (product) {
         this.repository.merge(product, dataToUpdate);
-        return this.repository.save(product);
+        return await this.repository.save(product);
       }
       return undefined;
     } catch (error) {
@@ -58,14 +54,14 @@ export class ProductManager {
   public async getProductsBySQLFilter(requestBody: SQLFiltered): Promise<Product[]> {
     try {
       const query = `SELECT * FROM products WHERE ${requestBody.field} ${requestBody.operator} '${requestBody.value}'`;
-      const products: Product[] = await this.repository.query(query);
+      const products: Product[] = (await this.repository.query(query)) as Product[];
       return products;
     } catch (error) {
       throw error;
     }
   }
 
-  public async queryProductsByPolygon(operator: string, value: any): Promise<Product[]> {
+  public async queryProductsByPolygon(operator: string, value: unknown): Promise<Product[]> {
     let sqlQuery = '';
     switch (operator) {
       case 'contains':
@@ -83,19 +79,21 @@ export class ProductManager {
     this.logger.info(sqlQuery);
 
     try {
-      const products = await this.repository.query(sqlQuery);
+      const products: Product[] = (await this.repository.query(sqlQuery)) as Product[];
       return products;
     } catch (error) {
-      throw new Error(`Error querying products: ${error}`);
+      if (error instanceof Error) {
+        this.logger.error({ msg: `Error querying products: ${error.message}` });
+      }
+      throw new Error();
     }
   }
 
-  public async getById (id:number): Promise<void> {
+  public async getById(id: number): Promise<void> {
     try {
-      await this.repository.findOneBy({id});
+      await this.repository.findOneBy({ id });
     } catch (error) {
       throw error;
     }
   }
 }
-

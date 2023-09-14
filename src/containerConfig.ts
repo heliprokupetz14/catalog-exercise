@@ -4,11 +4,11 @@ import { trace, metrics as OtelMetrics } from '@opentelemetry/api';
 import { DependencyContainer } from 'tsyringe/dist/typings/types';
 import jsLogger, { LoggerOptions } from '@map-colonies/js-logger';
 import { Metrics } from '@map-colonies/telemetry';
+import { DataSourceOptions, createConnection } from 'typeorm';
 import { SERVICES, SERVICE_NAME } from './common/constants';
 import { tracing } from './common/tracing';
 import { productFactory, PRODUCT_ROUTER_SYMBOL } from './product/routes/productRouter';
 import { InjectionObject, registerDependencies } from './common/dependencyRegistration';
-import { DataSourceOptions, createConnection } from 'typeorm';
 import { Product } from './product/entities/productEntity';
 
 export const ENTITIES_DIRS = [Product, 'src/product/entities/*.ts'];

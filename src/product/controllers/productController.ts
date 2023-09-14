@@ -1,20 +1,23 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Logger } from '@map-colonies/js-logger';
 import { RequestHandler } from 'express';
 import { injectable, inject } from 'tsyringe';
-import { SERVICES } from '../../common/constants';
-import { ProductManager } from '../models/productManager';
 import { Request, Response } from 'express';
 import { Repository } from 'typeorm';
+import { SERVICES } from '../../common/constants';
+import { ProductManager } from '../models/productManager';
 import { GeoSchema, SQLFiltered } from '../../common/interfaces';
 import { Operators } from '../../common/enums';
 import { Product } from '../entities/productEntity';
 
 type GetProductHandler = RequestHandler<SQLFiltered, Product[]>;
-
+type GetPolygonHandler = RequestHandler<GeoSchema, Product[]>;
 
 @injectable()
 export class ProductController {
-
   public constructor(
     @inject(SERVICES.LOGGER) private readonly logger: Logger,
     @inject(SERVICES.METADATA_REPOSITORY) private readonly repository: Repository<Product>,
@@ -22,10 +25,9 @@ export class ProductController {
   ) {}
 
   public createProduct = async (req: Request, res: Response) => {
-    const productData: Product = req.body;
-
+    const productData: Product = req.body as Product;
     try {
-      const newProduct = this.manager.createProduct(productData);
+      const newProduct = await this.manager.createProduct(productData);
       res.status(201).json(newProduct);
     } catch (error) {
       this.logger.error('Error creating product:', error);
@@ -46,7 +48,7 @@ export class ProductController {
   public deleteProduct = async (req: Request, res: Response) => {
     const productId: number = parseInt(req.params.id);
     try {
-      this.manager.deleteProductById(productId);
+      await this.manager.deleteProductById(productId);
       res.json({
         message: 'success',
       });
@@ -92,11 +94,11 @@ export class ProductController {
     }
   };
 
-  public postPolygonProduct: GetProductHandler = async (req, res, next) => {
+  public postPolygonProduct: GetPolygonHandler = async (req, res) => {
     const { operator, value } = req.body;
 
     try {
-      const products = await this.manager.queryProductsByPolygon(operator, value);
+      const products: Product[] = await this.manager.queryProductsByPolygon(operator, value);
       return res.status(200).json(products);
     } catch (error) {
       console.error('Error querying products:', error);
@@ -107,13 +109,14 @@ export class ProductController {
   public getById = async (res: Response, req: Request) => {
     const productId: number = parseInt(req.params.id);
     try {
-      const product = await this.manager.getById(productId)
+      const product = await this.manager.getById(productId);
       res.json({
         message: 'success',
+        payload: product,
       });
     } catch (error) {
       this.logger.error('Error deleting product:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
-  }
+  };
 }
