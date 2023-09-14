@@ -10,6 +10,7 @@ info:
 paths:
   /product/allProducts:
     get:
+      operationId: getAllProducts
       tags:
         - General Operations
       summary: Returns a list of all the products with the offset of 100.
@@ -161,7 +162,7 @@ paths:
         default:
           description: unexpected error
 
-  /product/equalType/type/{operator}/{enum}:
+  /product/equalType/{type}/{operator}/{enum}:
     get:
       tags:
         - Enum Operations
@@ -191,7 +192,7 @@ paths:
         default:
           description: unexpected error
 
-  /product/equalConsumptionProtocol/protocol/{equal}/{enum}:
+  /product/equalConsumptionProtocol/{protocol}/{equal}/{enum}:
     get:
       tags:
         - Enum Operations
@@ -226,6 +227,7 @@ paths:
       tags:
         - Geo-Shape Operations
       summary: Query products by polygon
+      operationId: postPolygon
       requestBody:
         required: true
         content:
@@ -325,24 +327,7 @@ components:
         maxZoom:
           type: number
 
-    Geometry:
-      type: object
-      description: GeoJSon geometry
-      required:
-        - type
-      externalDocs:
-        url: http://geojson.org/geojson-spec.html#geometry-objects
-      properties:
-        type:
-          type: string
-          enum:
-            - Point
-            - LineString
-            - Polygon
-            - MultiPoint
-            - MultiLineString
-            - MultiPolygon
-          description: the geometry type
+
 
     Polygon:
       type: object
