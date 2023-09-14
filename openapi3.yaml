@@ -10,10 +10,11 @@ info:
 paths:
   /product/allProducts:
     get:
-      operationId: getAllProducts
       tags:
         - General Operations
       summary: Returns a list of all the products with the offset of 100.
+      operationId: getAllProducts
+
       responses:
         '200':
           description: Got a list of products.
@@ -162,7 +163,7 @@ paths:
         default:
           description: unexpected error
 
-  /product/equalType/{type}/{operator}/{enum}:
+  /product/equalType/type/{operator}/{enum}:
     get:
       tags:
         - Enum Operations
@@ -192,7 +193,7 @@ paths:
         default:
           description: unexpected error
 
-  /product/equalConsumptionProtocol/{protocol}/{equal}/{enum}:
+  /product/equalConsumptionProtocol/protocol/{equal}/{enum}:
     get:
       tags:
         - Enum Operations
