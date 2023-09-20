@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as supertest from 'supertest';
 import { Application } from 'express';
 import { container } from 'tsyringe';
 import { ServerBuilder } from '../../src/serverBuilder';
 import { SERVICES } from '../../src/common/constants';
 import { Product } from '../../src/product/entities/productEntity';
+
+let app: Application;
 
 export function getApp(): Application {
   const builder = container.resolve<ServerBuilder>(ServerBuilder);

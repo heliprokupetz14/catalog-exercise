@@ -1,11 +1,22 @@
 import { faker } from '@faker-js/faker';
-import { Product } from '../product/entities/productEntity';
-import { ProductType, ConsumptionProtocol } from '../product/../common/enums';
+import { container } from 'tsyringe';
+import { Application } from 'express';
+import { ServerBuilder } from '../../src/serverBuilder';
+import { Product } from '../../src/product/entities/productEntity';
+import { ProductType, ConsumptionProtocol } from '../../src/common/enums';
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+let app: Application;
 
 export function getRandomEnumValue<T>(enumObj: Record<string, T>): T {
   const enumValues = Object.values(enumObj);
   const randomIndex = faker.datatype.number({ min: 0, max: enumValues.length - 1 });
   return enumValues[randomIndex];
+}
+
+export function init(): void {
+  const builder = container.resolve<ServerBuilder>(ServerBuilder);
+  app = builder.build();
 }
 
 export function createFakeProduct(): Product {

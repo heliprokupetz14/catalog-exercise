@@ -42,7 +42,7 @@ paths:
       tags:
         - General Operations
       summary: Updates a product based on the ID supplied.
-      operationId: deleteProduct
+      operationId: updateProduct
       parameters:
         - name: id
           in: path
@@ -327,8 +327,6 @@ components:
           type: number
         maxZoom:
           type: number
-
-
 
     Polygon:
       type: object

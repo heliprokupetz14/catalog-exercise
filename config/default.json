@@ -25,7 +25,7 @@
       }
     }
   },
-  "dbConfig": {
+  "test": {
     "type": "postgres",
     "host": "localhost",
     "port": 5432,
@@ -33,12 +33,12 @@
     "password": "postgres",
     "database": "catalog"
   },
-  "test": {
+  "db": {
     "type": "postgres",
-    "host": "localhost",
+    "host": "10.0.4.4",
     "port": 5432,
     "username": "postgres",
-    "password": "postgres",
+    "password": "Libot4allnonprod",
     "database": "catalog"
   }
 }

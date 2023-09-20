@@ -10,6 +10,7 @@ import { tracing } from './common/tracing';
 import { productFactory, PRODUCT_ROUTER_SYMBOL } from './product/routes/productRouter';
 import { InjectionObject, registerDependencies } from './common/dependencyRegistration';
 import { Product } from './product/entities/productEntity';
+import { DBFromConfig } from './common/interfaces';
 
 export const ENTITIES_DIRS = [Product, 'src/product/entities/*.ts'];
 
@@ -21,9 +22,18 @@ export interface RegisterOptions {
 export const registerExternalValues = async (options?: RegisterOptions): Promise<DependencyContainer> => {
   const loggerConfig = config.get<LoggerOptions>('telemetry.logger');
   const logger = jsLogger({ ...loggerConfig, prettyPrint: loggerConfig.prettyPrint, mixin: getOtelMixin() });
-  const dbConfig = config.get<DataSourceOptions>('dbConfig');
-  const dbConnection = await createConnection({ entities: ENTITIES_DIRS, ...dbConfig });
-
+  const dbConfig = config.get<DBFromConfig>('db');
+  const trash: DataSourceOptions = {
+    host: dbConfig.host,
+    username: dbConfig.username,
+    password: dbConfig.password,
+    database: dbConfig.database,
+    port: dbConfig.port,
+    type: 'postgres',
+    url: `http://${dbConfig.host}:${dbConfig.port}`,
+  }
+  console.log(trash);
+  const dbConnection = await createConnection({ entities: ENTITIES_DIRS, ...trash });
   const metrics = new Metrics();
   metrics.start();
 

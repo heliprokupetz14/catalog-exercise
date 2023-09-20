@@ -9,6 +9,7 @@ import { ENTITIES_DIRS } from '../../src/containerConfig';
 async function registerTestValues(): Promise<void> {
   container.register(SERVICES.CONFIG, { useValue: config });
   container.register(SERVICES.LOGGER, { useValue: jsLogger({ enabled: false }) });
+  // container.register(SERVICES.PRODUCT_ROUTER_SYMBOL, { useFactory: productFactory });
 
   const dbConfig = config.get<DataSourceOptions>('test');
   const connection = await createConnection({ entities: ENTITIES_DIRS, ...dbConfig });

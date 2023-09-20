@@ -27,3 +27,13 @@ export interface GeoSchema {
 export interface PingResponse {
   message: string;
 }
+
+export interface DBFromConfig {
+    type: string;
+    host: string;
+    port: number;
+    username: string;
+    password: string;
+    database: string;
+    enableSslAuth: boolean;
+}

@@ -1,44 +1,48 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/naming-convention */
-import jsLogger from '@map-colonies/js-logger';
 import httpStatusCodes from 'http-status-codes';
 import { Application } from 'express';
 import { Connection, DataSourceOptions, QueryFailedError, createConnection } from 'typeorm';
 import { container } from 'tsyringe';
+import jsLogger from '@map-colonies/js-logger';
 import config from 'config';
 import * as requestSender from '../requestSender';
+import { Product } from '../../../src/product/entities/productEntity';
+import { createFakeEntity, createFakeProduct, getRandomEnumValue } from '../../helpers/helpers';
+import { GeoOperators } from '../../../src/common/enums';
 import { SERVICES } from '../../../src/common/constants';
 import { ENTITIES_DIRS } from '../../../src/containerConfig';
-import { Product } from '../../../src/product/entities/productEntity';
-import { createFakeEntity, createFakeProduct, getRandomEnumValue } from '../../../src/helpers/helpers';
-import { GeoOperators } from '../../../src/common/enums';
 
 describe('ProductController', function () {
   let app: Application;
-  let connection: Connection;
 
   beforeAll(async function () {
     container.register(SERVICES.CONFIG, { useValue: config });
     container.register(SERVICES.LOGGER, { useValue: jsLogger({ enabled: false }) });
+    // container.register(SERVICES.PRODUCT_ROUTER_SYMBOL, { useFactory: productFactory });
 
     const dbConfig = config.get<DataSourceOptions>('test');
     const connection = await createConnection({ entities: ENTITIES_DIRS, ...dbConfig });
-
     await connection.synchronize();
     const repository = connection.getRepository(Product);
-
     container.register(Connection, { useValue: connection });
     container.register(SERVICES.METADATA_REPOSITORY, { useValue: repository });
 
+    // await registerTestValues();
     app = requestSender.getApp();
   });
 
-  afterAll(async function () {
-    await connection.close();
+  afterEach(function () {
+    // container.reset();
+    // mockAxios.reset();
   });
 
   describe('GET/product/allProducts', function () {
     describe('Happy Path 🙂', function () {
-      it('should return 204 if there are no metadata records', async function () {
+      it('should return 204 if there are no products', async function () {
         const response = await requestSender.getAllProducts(app);
 
         expect(response.status).toBe(httpStatusCodes.NO_CONTENT);
@@ -58,36 +62,38 @@ describe('ProductController', function () {
         const { name, description, boundingPolygon, type, ...createResponseWithoutAnyText } = createResponse.body as unknown as Product;
         expect(response.body).toMatchObject([createResponseWithoutAnyText]);
       });
+    });
 
-      describe('Sad Path 😥', function () {
-        it('should return 500 status code if a db exception happens', async function () {
-          const findMock = jest.fn().mockRejectedValue(new QueryFailedError('select *', [], new Error('failed')));
-          const mockedApp = requestSender.getMockRepoApp({ find: findMock });
+    describe('Sad Path 😥', function () {
+      it('should return 500 status code if a db exception happens', async function () {
+        const findMock = jest.fn().mockRejectedValue(new QueryFailedError('select *', [], new Error('failed')));
+        const mockedApp = requestSender.getMockRepoApp({ find: findMock });
 
-          const response = await requestSender.getAllProducts(mockedApp);
+        const response = await requestSender.getAllProducts(mockedApp);
 
-          expect(response.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
-          expect(response.body).toHaveProperty('message', 'failed');
-        });
+        expect(response.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
+        expect(response.body).toHaveProperty('message', 'failed');
+      });
+    });
+  });
+
+  describe('POST/product/createProduct', function () {
+    describe('Happy Path 🙂', function () {
+      it('if productId not exists, should return 201 status code and the added product', async function () {
+        const product: Product = createFakeProduct();
+        const response = await requestSender.createProduct(app, product);
+        expect(response.status).toBe(httpStatusCodes.CREATED);
+        expect(response.headers).toHaveProperty('content-type', 'application/json');
+
+        const body = response.body as unknown as Product;
+        const getResponse = await requestSender.getById(app, product.id);
+        const { name, description, boundingPolygon, type, ...createdResponseBody } = body;
+
+        expect(getResponse.body).toMatchObject(createdResponseBody);
       });
     });
 
-    describe('POST/product/createProduct', function () {
-      describe('Happy Path 🙂', function () {
-        it('if productId not exists, should return 201 status code and the added product', async function () {
-          const product: Product = createFakeProduct();
-          const response = await requestSender.createProduct(app, product);
-          expect(response.status).toBe(httpStatusCodes.CREATED);
-          expect(response.headers).toHaveProperty('content-type', 'application/json');
-
-          const body = response.body as unknown as Product;
-          const getResponse = await requestSender.getById(app, product.id);
-          const { name, description, boundingPolygon, type, ...createdResponseBody } = body;
-
-          expect(getResponse.body).toMatchObject(createdResponseBody);
-        });
-      });
-
+    describe('Sad Path 🙂', function () {
       it('should return 500 status code if a db exception happens', async function () {
         const product = createFakeProduct();
         const findMock = jest.fn().mockRejectedValue(new QueryFailedError('select *', [], new Error('failed')));
@@ -115,15 +121,17 @@ describe('ProductController', function () {
       });
     });
 
-    it('should return 500 status code if a db exception happens', async function () {
-      const entity = createFakeEntity();
-      const findMock = jest.fn().mockRejectedValue(new QueryFailedError('select *', [], new Error('failed')));
-      const mockedApp = requestSender.getMockRepoApp({ findOne: findMock });
+    describe('Sad Path 🙂', function () {
+      it('should return 500 status code if a db exception happens', async function () {
+        const entity = createFakeEntity();
+        const findMock = jest.fn().mockRejectedValue(new QueryFailedError('select *', [], new Error('failed')));
+        const mockedApp = requestSender.getMockRepoApp({ findOne: findMock });
 
-      const response = await requestSender.updatedProduct(mockedApp, entity.id, entity);
+        const response = await requestSender.updatedProduct(mockedApp, entity.id, entity);
 
-      expect(response.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
-      expect(response.body).toHaveProperty('message', 'failed');
+        expect(response.status).toBe(httpStatusCodes.INTERNAL_SERVER_ERROR);
+        expect(response.body).toHaveProperty('message', 'failed');
+      });
     });
   });
 
