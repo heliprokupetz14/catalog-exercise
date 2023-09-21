@@ -25,14 +25,6 @@
       }
     }
   },
-  "test": {
-    "type": "postgres",
-    "host": "localhost",
-    "port": 5432,
-    "username": "postgres",
-    "password": "postgres",
-    "database": "catalog"
-  },
   "db": {
     "type": "postgres",
     "host": "10.0.4.4",

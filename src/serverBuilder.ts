@@ -43,7 +43,6 @@ export class ServerBuilder {
 
   private buildRoutes(): void {
     this.serverInstance.use('/product', this.productRouter);
-    // this.serverInstance.use('/anotherResource', this.anotherResourceRouter);
     this.buildDocsRoutes();
   }
 

@@ -112,7 +112,7 @@ export class ProductController {
       const product = await this.manager.getById(productId);
       res.json({
         message: 'success',
-        payload: product,
+        payload: product
       });
     } catch (error) {
       this.logger.error('Error deleting product:', error);
