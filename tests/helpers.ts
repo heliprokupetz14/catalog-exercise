@@ -1,9 +1,9 @@
 import { faker } from '@faker-js/faker';
 import { container } from 'tsyringe';
 import { Application } from 'express';
-import { ServerBuilder } from '../../src/serverBuilder';
-import { Product } from '../../src/product/entities/productEntity';
-import { ProductType, ConsumptionProtocol } from '../../src/common/enums';
+import { ServerBuilder } from '../src/serverBuilder';
+import { Product } from '../src/product/entities/productEntity';
+import { ProductType, ConsumptionProtocol } from '../src/common/enums';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 let app: Application;

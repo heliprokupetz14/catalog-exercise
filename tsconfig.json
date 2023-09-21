@@ -11,6 +11,6 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
   },
-  "include": ["src", "tests/helpers"],
+  "include": ["src", "tests/helpers", "tests/helpers.ts"],
   "exclude": ["node_modules", "dist", "tests"]
 }
