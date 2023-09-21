@@ -1,6 +1,4 @@
 import { readPackageJsonSync } from '@map-colonies/read-pkg';
-import { createConnection } from 'typeorm';
-import { Product } from '../product/entities/productEntity';
 import { ProductType, ConsumptionProtocol } from './enums';
 
 export const SERVICE_NAME = readPackageJsonSync().name ?? 'unknown_service';
@@ -43,12 +41,4 @@ export const productSchema = {
   required: ['name', 'description', 'boundingPolygon', 'consumtionLink', 'type', 'consumptionProtocol', 'resolutionBest', 'minZoom', 'maxZoom'],
 };
 
-export const connection = createConnection({
-  type: 'postgres',
-  host: 'localhost',
-  port: 5432,
-  username: 'postgres',
-  password: 'postgres',
-  database: 'catalog',
-  entities: [Product],
-});
+

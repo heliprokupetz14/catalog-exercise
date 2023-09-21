@@ -4,7 +4,7 @@ import { trace, metrics as OtelMetrics } from '@opentelemetry/api';
 import { DependencyContainer } from 'tsyringe/dist/typings/types';
 import jsLogger, { LoggerOptions } from '@map-colonies/js-logger';
 import { Metrics } from '@map-colonies/telemetry';
-import { DataSourceOptions, createConnection } from 'typeorm';
+import { DataSourceOptions, DataSource } from 'typeorm';
 import { SERVICES, SERVICE_NAME } from './common/constants';
 import { tracing } from './common/tracing';
 import { productFactory, PRODUCT_ROUTER_SYMBOL } from './product/routes/productRouter';
@@ -30,10 +30,17 @@ export const registerExternalValues = async (options?: RegisterOptions): Promise
     database: dbConfig.database,
     port: dbConfig.port,
     type: 'postgres',
-    url: `http://${dbConfig.host}:${dbConfig.port}`,
-  }
+  };
+  process.on('uncaughtException',(e) => {
+    console.log(e.stack);
+    process.exit();
+    
+  })
   console.log(trash);
-  const dbConnection = await createConnection({ entities: ENTITIES_DIRS, ...trash });
+  const dbConnection = new DataSource({ entities: ENTITIES_DIRS, ...trash});
+  
+  await dbConnection.initialize();
+
   const metrics = new Metrics();
   metrics.start();
 

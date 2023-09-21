@@ -6,7 +6,7 @@ global:
 
 image:
   repository: "geo-catalog"
-  tag: "v1.0.7"
+  tag: "v1.0.8"
 
 enabled: true
 environment: "development"
