@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import config from 'config';
 import { getOtelMixin } from '@map-colonies/telemetry';
 import { trace, metrics as OtelMetrics } from '@opentelemetry/api';
@@ -23,7 +24,7 @@ export const registerExternalValues = async (options?: RegisterOptions): Promise
   const loggerConfig = config.get<LoggerOptions>('telemetry.logger');
   const logger = jsLogger({ ...loggerConfig, prettyPrint: loggerConfig.prettyPrint, mixin: getOtelMixin() });
   const dbConfig = config.get<DBFromConfig>('db');
-  const trash: DataSourceOptions = {
+  const dataSource: DataSourceOptions = {
     host: dbConfig.host,
     username: dbConfig.username,
     password: dbConfig.password,
@@ -32,8 +33,8 @@ export const registerExternalValues = async (options?: RegisterOptions): Promise
     type: 'postgres',
   };
 
-  console.log(trash);
-  const dbConnection = new DataSource({ entities: ENTITIES_DIRS, ...trash });
+  console.log(dataSource);
+  const dbConnection = new DataSource({ entities: ENTITIES_DIRS, ...dataSource });
   await dbConnection.initialize();
 
   const metrics = new Metrics();
