@@ -24,5 +24,13 @@
         "options": null
       }
     }
+  },
+  "db": {
+    "type": "postgres",
+    "host": "10.0.4.4",
+    "port": 5432,
+    "username": "postgres",
+    "password": "Libot4allnonprod",
+    "database": "catalog"
   }
 }

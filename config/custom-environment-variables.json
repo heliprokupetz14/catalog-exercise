@@ -38,5 +38,20 @@
         }
       }
     }
+  },
+  "db": {
+    "type": "DB_TYPE",
+    "host": "DB_HOST",
+    "port": {
+      "__name": "DB_PORT",
+      "__format": "number"
+    },
+    "username": "DB_USERNAME",
+    "password": "DB_PASSWORD",
+    "enableSslAuth": {
+      "__name": "DB_ENABLE_SSL_AUTH",
+      "__format": "boolean"
+    },
+    "database": "DB_NAME"
   }
 }

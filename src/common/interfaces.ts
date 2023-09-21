@@ -1,3 +1,5 @@
+import { GeoOperators } from './enums';
+
 export interface IConfig {
   get: <T>(setting: string) => T;
   has: (setting: string) => boolean;
@@ -8,4 +10,30 @@ export interface OpenApiConfig {
   basePath: string;
   jsonPath: string;
   uiPath: string;
+}
+
+export interface SQLFiltered {
+  field: string;
+  operator: string;
+  value: string | number;
+}
+
+export interface GeoSchema {
+  field: string;
+  operator: GeoOperators;
+  value: unknown;
+}
+
+export interface PingResponse {
+  message: string;
+}
+
+export interface DBFromConfig {
+  type: string;
+  host: string;
+  port: number;
+  username: string;
+  password: string;
+  database: string;
+  enableSslAuth: boolean;
 }
