@@ -14,5 +14,3 @@ export const SERVICES: Record<string, symbol> = {
   METER: Symbol('Meter'),
   METADATA_REPOSITORY: Symbol('Database'),
 };
-
-
