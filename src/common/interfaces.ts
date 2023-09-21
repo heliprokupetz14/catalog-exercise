@@ -29,11 +29,11 @@ export interface PingResponse {
 }
 
 export interface DBFromConfig {
-    type: string;
-    host: string;
-    port: number;
-    username: string;
-    password: string;
-    database: string;
-    enableSslAuth: boolean;
+  type: string;
+  host: string;
+  port: number;
+  username: string;
+  password: string;
+  database: string;
+  enableSslAuth: boolean;
 }

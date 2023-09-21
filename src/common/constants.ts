@@ -40,5 +40,3 @@ export const productSchema = {
   },
   required: ['name', 'description', 'boundingPolygon', 'consumtionLink', 'type', 'consumptionProtocol', 'resolutionBest', 'minZoom', 'maxZoom'],
 };
-
-

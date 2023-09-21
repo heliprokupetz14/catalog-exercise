@@ -31,14 +31,13 @@ export const registerExternalValues = async (options?: RegisterOptions): Promise
     port: dbConfig.port,
     type: 'postgres',
   };
-  process.on('uncaughtException',(e) => {
+  process.on('uncaughtException', (e) => {
     console.log(e.stack);
     process.exit();
-    
-  })
+  });
   console.log(trash);
-  const dbConnection = new DataSource({ entities: ENTITIES_DIRS, ...trash});
-  
+  const dbConnection = new DataSource({ entities: ENTITIES_DIRS, ...trash });
+
   await dbConnection.initialize();
 
   const metrics = new Metrics();
